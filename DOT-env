@@ -1,0 +1,17 @@
+# NOTE: No quotes around the following:
+# This is the password for the bind server webadmin interface, which
+# is exposed to the host at port 10000.  Username is root
+ROOT_PASSWORD=password
+# The following are used to do template substitution in the 
+# slash-zimbra/zimbra-config file prior to feeding it to
+# zmsetup.pl
+TIME_ZONE_ID=UTC
+ADMIN_PW=zimbra
+LDAP_ADMIN_PW=zimbra
+LDAP_AMAVIS_PW=zimbra
+LDAP_POSTFIX_PW=zimbra
+LDAP_REPLICATION_PW=zimbra
+LDAP_ROOT_PW=zimbra
+LDAP_BES_PW=zimbra
+LDAP_NGINX_PW=zimbra
+

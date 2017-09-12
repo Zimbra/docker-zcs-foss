@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  bind:
+    image: sameersbn/bind:9.9.5-20170626
+    env_file: .env
+    volumes:
+      - ./bind-data:/data/
+    container_name: bind
+    domainname: zcs-foss.test
+    dns:
+      - 8.8.8.8
+    hostname: bind
+    networks:
+      default:
+        ipv4_address: 10.0.1.2
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "10000:10000/tcp"
+
+  zimbra:
+    image: zimbra/zcs-foss:8.8.3
+    env_file: .env
+    entrypoint:
+      - /zimbra/init
+    depends_on:
+      - bind
+    container_name: zimbra
+    domainname: zcs-foss.test
+    dns:
+      - 10.0.1.2
+      - 8.8.8.8
+    hostname: zimbra
+    networks:
+      default:
+        ipv4_address: 10.0.1.3
+    ports:
+      - "2222:22"
+      - "7071:7071"
+      - "8143:143"
+      - "8443:443"
+      - "8993:993"
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24

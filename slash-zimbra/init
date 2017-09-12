@@ -1,0 +1,29 @@
+#!/bin/bash
+# Perform template substitution in /zimbra/zimbra-config then configure the system
+# Expects the following environment variables to be set:
+#   TIME_ZONE_ID
+#   ADMIN_PW
+#   LDAP_ADMIN_PW
+#   LDAP_AMAVIS_PW
+#   LDAP_POSTFIX_PW
+#   LDAP_REPLICATION_PW
+#   LDAP_ROOT_PW
+#   LDAP_BES_PW
+#   LDAP_NGINX_PW
+
+sed -i.bak \
+    -e "s/TIME_ZONE_ID/${TIME_ZONE_ID}/" \
+    -e "s/LDAP_ADMIN_PW/${LDAP_ADMIN_PW}/" \
+    -e "s/ADMIN_PW/${ADMIN_PW}/" \
+    -e "s/LDAP_AMAVIS_PW/${LDAP_AMAVIS_PW}/" \
+    -e "s/LDAP_POSTFIX_PW/${LDAP_POSTFIX_PW}/" \
+    -e "s/LDAP_REPLICATION_PW/${LDAP_REPLICATION_PW}/" \
+    -e "s/LDAP_ROOT_PW/${LDAP_ROOT_PW}/" \
+    -e "s/LDAP_BES_PW/${LDAP_BES_PW}/" \
+    -e "s/LDAP_NGINX_PW/${LDAP_NGINX_PW}/" \
+    /zimbra/zimbra-config
+
+/opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
+echo "SETUP COMPLETE"
+/bin/sleep infinity
+

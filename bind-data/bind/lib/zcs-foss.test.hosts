@@ -1,0 +1,11 @@
+$ttl 38400
+zcs-foss.test.	IN	SOA	zcs-foss.test. admin.zcs-foss.test. (
+			1505170659
+			10800
+			3600
+			604800
+			38400 )
+zcs-foss.test.	IN	NS	bind.zcs-foss.test.
+bind.zcs-foss.test.	IN	A	10.0.1.2
+zimbra.zcs-foss.test.	IN	A	10.0.1.3
+@	IN	MX	10 zimbra.zcs-foss.test.
