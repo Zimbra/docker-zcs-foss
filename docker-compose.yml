@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   bind:
@@ -27,6 +27,12 @@ services:
     depends_on:
       - bind
     container_name: zimbra
+    volumes:
+      - type: volume
+        source: opt_zimbra
+        target: /opt/zimbra
+        volume:
+          nocopy: false
     domainname: zcs-foss.test
     dns:
       - 10.0.1.2
@@ -49,3 +55,6 @@ networks:
       driver: default
       config:
         - subnet: 10.0.1.0/24
+
+volumes:
+    opt_zimbra:

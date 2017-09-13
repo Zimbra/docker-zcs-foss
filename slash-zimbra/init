@@ -11,19 +11,31 @@
 #   LDAP_BES_PW
 #   LDAP_NGINX_PW
 
-sed -i.bak \
-    -e "s/TIME_ZONE_ID/${TIME_ZONE_ID}/" \
-    -e "s/LDAP_ADMIN_PW/${LDAP_ADMIN_PW}/" \
-    -e "s/ADMIN_PW/${ADMIN_PW}/" \
-    -e "s/LDAP_AMAVIS_PW/${LDAP_AMAVIS_PW}/" \
-    -e "s/LDAP_POSTFIX_PW/${LDAP_POSTFIX_PW}/" \
-    -e "s/LDAP_REPLICATION_PW/${LDAP_REPLICATION_PW}/" \
-    -e "s/LDAP_ROOT_PW/${LDAP_ROOT_PW}/" \
-    -e "s/LDAP_BES_PW/${LDAP_BES_PW}/" \
-    -e "s/LDAP_NGINX_PW/${LDAP_NGINX_PW}/" \
-    /zimbra/zimbra-config
+grep -q 'CONFIG SESSION COMPLETE' /opt/zimbra/.install_history
+if [ $? -eq 0 ]
+then
+    crontab -u zimbra /opt/zimbra/backup/crontab.bak
+    cp /opt/zimbra/backup/60-zimbra.conf.bak /etc/rsyslog.d/60-zimbra.conf
+    service rsyslog restart
+    sudo -i -u zimbra zmcontrol start
+    echo "SYSTEM ALREADY CONFIGURED"
+else
+    sed -i.bak \
+        -e "s/TIME_ZONE_ID/${TIME_ZONE_ID}/" \
+        -e "s/LDAP_ADMIN_PW/${LDAP_ADMIN_PW}/" \
+        -e "s/ADMIN_PW/${ADMIN_PW}/" \
+        -e "s/LDAP_AMAVIS_PW/${LDAP_AMAVIS_PW}/" \
+        -e "s/LDAP_POSTFIX_PW/${LDAP_POSTFIX_PW}/" \
+        -e "s/LDAP_REPLICATION_PW/${LDAP_REPLICATION_PW}/" \
+        -e "s/LDAP_ROOT_PW/${LDAP_ROOT_PW}/" \
+        -e "s/LDAP_BES_PW/${LDAP_BES_PW}/" \
+        -e "s/LDAP_NGINX_PW/${LDAP_NGINX_PW}/" \
+        /zimbra/zimbra-config
 
-/opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
+    /opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
+    sudo -i -u zimbra /bin/bash -c "crontab -l > /opt/zimbra/backup/crontab.bak"
+    cp /etc/rsyslog.d/60-zimbra.conf /opt/zimbra/backup/60-zimbra.conf.bak
+fi
 echo "SETUP COMPLETE"
 /bin/sleep infinity
 
