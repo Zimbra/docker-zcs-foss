@@ -7,6 +7,7 @@ RUN apt-get update && \
     dnsutils \
     gettext \
     linux-tools-common \
+    openssh-client \
     net-tools \
     rsyslog \
     software-properties-common \
