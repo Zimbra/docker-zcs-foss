@@ -59,3 +59,19 @@ If you _want_ to reset the data, just stop the cluster and remove the volume lik
 
 The next time you start the cluster it will recreate that volume run through the `zmsetup.pl` process again.
 
+## Disabling Data Persistence
+
+If you do _not_ need the _Data Persistence_ feture, just edit the `docker-compose.yml` file and remove the following:
+
+
+    volumes:
+      - type: volume
+        source: opt_zimbra
+        target: /opt/zimbra
+        volume:
+          nocopy: false
+
+
+    volumes:
+        opt_zimbra:
+
