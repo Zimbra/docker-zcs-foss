@@ -5,10 +5,23 @@ This provides a simple two-container cluster:
 - `zimbra` - A basic Zimbra installation. This is intended primarily for testing.  Currently running version 8.8.3.
 - `bind` - A simple bind DNS server, preconfigured with MX and A records.
 
+## feature/genesis branch notes
+
+If you are experimenting with the `feature/genesis` branch and you had been using `master`:
+
+* Removed the old docker volume before running. See instructions near the bottom of this _README_ if you need help.
+* Make sure to update your existing `.env` file with new information from the `DOT-env` template file. The `DOT-env` template file settings are correct for running the [zm-genesis](https://github.com/Zimbra/zm-genesis) tests, which are pre-installed and configured in the new Docker image.
+* You can delete your local copy of the old (`master` branch version of) the `zimbra/zcs-foss` Docker image if you like.
+
+To run the full Genesis test plan, execute the following on the running `zimbra` container:
+
+    cd /opt/qa/genesis && \
+    source /etc/profile.d/rvm.sh && \
+    ruby runtest.rb --plan conf/genesis/smokeoss.txt --log /tmp/genesis
+
 ## Preconditions
 
 The following assumes you have `docker` and `docker-compose` installed.  See [this page](https://github.com/Zimbra/docker-zcs-dev-machine) for help with that.
-
 
 ## Setup
 
