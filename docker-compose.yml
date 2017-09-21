@@ -4,6 +4,8 @@ services:
   bind:
     image: sameersbn/bind:9.9.5-20170626
     env_file: .env
+    entrypoint:
+      - /data/init
     volumes:
       - ./bind-data:/data/
     container_name: bind

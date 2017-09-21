@@ -1,0 +1,20 @@
+#!/bin/bash
+# Create the following files by doing environment substitution on the input templates:
+#   /data/bind/etc/named.conf.local.in  -> /data/bind/etc/named.conf.local
+#   /data/bind/lib/zimbra.test.hosts.in -> /data/bind/lib/zimbra.test.hosts
+# Expects the following in the environment:
+#   ZIMBRA_DEFAULT_DOMAIN
+#   ZIMBRA_HOST_NAME
+# Will then start bind services
+
+cat /data/bind/etc/named.conf.local.in | \
+sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
+    -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/g" \
+> /data/bind/etc/named.conf.local
+
+cat /data/bind/lib/zimbra.test.hosts.in | \
+sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
+    -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/g" \
+> /data/bind/lib/zimbra.test.hosts
+
+/sbin/entrypoint.sh /usr/sbin/named

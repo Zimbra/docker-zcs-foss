@@ -6,7 +6,7 @@
 // organization
 //include "/etc/bind/zones.rfc1918";
 
-zone "zcs-foss.test" {
+zone "ZIMBRA_DEFAULT_DOMAIN" {
 	type master;
-	file "/var/lib/bind/zcs-foss.test.hosts";
+	file "/var/lib/bind/zimbra.test.hosts";
 	};
