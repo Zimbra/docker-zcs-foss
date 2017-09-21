@@ -10,6 +10,11 @@ TZDATA_ZONE=Pacific
 # slash-zimbra/zimbra-config file prior to feeding it to
 # zmsetup.pl.  The first two are also used to configure bind.
 ZIMBRA_DEFAULT_DOMAIN=zimbra.zcs-foss.test
+# NOTE: This should be the FQDN. Yes it is silly because
+#       we _should_ be able to to construct it, given the
+#       previous value; however, the current limitation of
+#       the Genesis test suite is that the zmhostname
+#       _matches_ the default domain name...
 ZIMBRA_HOST_NAME=zimbra.zcs-foss.test
 TIME_ZONE_ID=PDT
 ADMIN_PW=test123
