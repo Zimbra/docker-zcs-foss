@@ -38,7 +38,7 @@ RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
 # Ruby environment that is used for the test suite.
 # ************************************************************************
 RUN mkdir -p /opt/qa/genesis && \
-    curl -k -s -L -o /tmp/genesis.tar https://github.com/Zimbra/zm-genesis/raw/develop/build/genesis.tar && \
+    curl -k -s -o /tmp/genesis.tar 'https://zcsdocker.s3.amazonaws.com/genesis-20170921.tar' && \
     tar xvf /tmp/genesis.tar -C /opt/qa/genesis --strip-components=1 && \
     rm /tmp/genesis.tar
 
