@@ -14,8 +14,30 @@ RUN apt-get update && \
     vim \
     wget
 
+# ************************************************************************
+# The following is required for Genesis tests to be run.
+# NOTE: Work is in progress to allow for remote test execution
+# ************************************************************************
+
+# Set tzdata info to UTC (Etc/UTC) for image.
+# Runtime will reconfigure to match what is in environment
+RUN apt-get install -y man psutils psmisc ruby-dev gcc && \
+    echo "tzdata tzdata/Areas select Etc" > /tmp/tzdata.txt && \
+    echo "tzdata tzdata/Zones/US select UTC" >> /tmp/tzdata.txt && \
+    export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+    debconf-set-selections /tmp/tzdata.txt && \
+    apt-get install -y tzdata
+
+# 1. Disable setting that prevents users from writing to current terminal device 
+# 2. Symlink in /bin/env (some genesis tests expect it to be there)
+RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
+    ln -s /usr/bin/env /bin/env
+
+# Pre-create the zimbra user with known uid/gid so that IF a user wants to mount a host
+# directory into the container, the permissions will be correct.
 RUN groupadd -r -g 1000 zimbra && \
     useradd -r -g zimbra -u 1000 -b /opt -s /bin/bash zimbra
+
 RUN curl -s -k -o /tmp/zcs.tgz 'https://files.zimbra.com.s3.amazonaws.com/downloads/8.8.3_GA/zcs-8.8.3_GA_1872.UBUNTU16_64.20170905143325.tgz'
 RUN mkdir -p /tmp/release && \
     tar xzvf /tmp/zcs.tgz -C /tmp/release --strip-components=1 && \
