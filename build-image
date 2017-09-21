@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -f Dockerfile -t zimbra/zcs-foss:8.8.3 $(dirname $0)
+docker build -f Dockerfile -t zimbra/zcs-foss:8.8.3-genesis $(dirname $0)

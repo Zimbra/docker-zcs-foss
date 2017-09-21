@@ -1,6 +1,8 @@
 #!/bin/bash
 # Perform template substitution in /zimbra/zimbra-config then configure the system
 # Expects the following environment variables to be set:
+#   ZIMBRA_DEFAULT_DOMAIN
+#   ZIMBRA_DEFAULT_DOMAIN
 #   TIME_ZONE_ID
 #   ADMIN_PW
 #   LDAP_ADMIN_PW
@@ -10,6 +12,16 @@
 #   LDAP_ROOT_PW
 #   LDAP_BES_PW
 #   LDAP_NGINX_PW
+# Also reconfigures tzdata.  Expects these environment variables for that:
+#   TZDATA_AREA
+#   TZDATA_ZONE
+#
+
+echo "tzdata tzdata/Areas select ${TZDATA_AREA}" > /tmp/tzdata.txt
+echo "tzdata tzdata/Zones/US select ${TZDATA_ZONE}" >> /tmp/tzdata.txt
+export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+    debconf-set-selections /tmp/tzdata.txt && \
+    dpkg-reconfigure tzdata
 
 grep -q 'CONFIG SESSION COMPLETE' /opt/zimbra/.install_history
 if [ $? -eq 0 ]
@@ -21,6 +33,8 @@ then
     echo "SYSTEM ALREADY CONFIGURED"
 else
     sed -i.bak \
+        -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/" \
+        -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/" \
         -e "s/TIME_ZONE_ID/${TIME_ZONE_ID}/" \
         -e "s/LDAP_ADMIN_PW/${LDAP_ADMIN_PW}/" \
         -e "s/ADMIN_PW/${ADMIN_PW}/" \
@@ -32,9 +46,9 @@ else
         -e "s/LDAP_NGINX_PW/${LDAP_NGINX_PW}/" \
         /zimbra/zimbra-config
 
-    /opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
-    sudo -i -u zimbra /bin/bash -c "crontab -l > /opt/zimbra/backup/crontab.bak"
-    cp /etc/rsyslog.d/60-zimbra.conf /opt/zimbra/backup/60-zimbra.conf.bak
+        /opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
+        sudo -i -u zimbra /bin/bash -c "crontab -l > /opt/zimbra/backup/crontab.bak"
+        cp /etc/rsyslog.d/60-zimbra.conf /opt/zimbra/backup/60-zimbra.conf.bak
 fi
 echo "SETUP COMPLETE"
 /bin/sleep infinity

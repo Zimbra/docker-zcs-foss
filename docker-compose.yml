@@ -22,7 +22,7 @@ services:
       - "10000:10000/tcp"
 
   zimbra:
-    image: zimbra/zcs-foss:8.8.3
+    image: zimbra/zcs-foss:8.8.3-genesis
     env_file: .env
     entrypoint:
       - /zimbra/init
@@ -35,11 +35,10 @@ services:
         target: /opt/zimbra
         volume:
           nocopy: false
-    domainname: zcs-foss.test
     dns:
       - 10.0.1.2
       - 8.8.8.8
-    hostname: zimbra
+    hostname: ${ZIMBRA_HOST_NAME}
     networks:
       default:
         ipv4_address: 10.0.1.3
