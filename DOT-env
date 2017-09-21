@@ -5,8 +5,8 @@ ROOT_PASSWORD=password
 # The following are used to do template substitution in the 
 # slash-zimbra/zimbra-config file prior to feeding it to
 # zmsetup.pl
-TIME_ZONE_ID=UTC
-ADMIN_PW=zimbra
+TIME_ZONE_ID=PDT
+ADMIN_PW=test123
 LDAP_ADMIN_PW=zimbra
 LDAP_AMAVIS_PW=zimbra
 LDAP_POSTFIX_PW=zimbra
