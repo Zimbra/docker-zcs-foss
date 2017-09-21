@@ -14,11 +14,6 @@ RUN apt-get update && \
     vim \
     wget
 
-# ************************************************************************
-# The following is required for Genesis tests to be run.
-# NOTE: Work is in progress to allow for remote test execution
-# ************************************************************************
-
 # Set tzdata info to UTC (Etc/UTC) for image.
 # Runtime will reconfigure to match what is in environment
 RUN apt-get install -y man psutils psmisc ruby-dev gcc && \
@@ -28,16 +23,52 @@ RUN apt-get install -y man psutils psmisc ruby-dev gcc && \
     debconf-set-selections /tmp/tzdata.txt && \
     apt-get install -y tzdata
 
+# ************************************************************************
+# The following is required for Genesis tests to be run.
+# NOTE: Work is in progress to allow for remote test execution
+# ************************************************************************
+
 # 1. Disable setting that prevents users from writing to current terminal device 
 # 2. Symlink in /bin/env (some genesis tests expect it to be there)
 RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
     ln -s /usr/bin/env /bin/env
 
+# ************************************************************************
+# Download and install the Genesis tests.  Set up and configure the
+# Ruby environment that is used for the test suite.
+# ************************************************************************
+RUN mkdir -p /opt/qa/genesis && \
+    curl -k -s -L -o /tmp/genesis.tar https://github.com/Zimbra/zm-genesis/raw/develop/build/genesis.tar && \
+    tar xvf /tmp/genesis.tar -C /opt/qa/genesis --strip-components=1 && \
+    rm /tmp/genesis.tar
+
+RUN gpg --keyserver keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+
+RUN mkdir -p /opt/qa/genesis && \
+    curl -k -s -L -o /tmp/genesis.tar https://github.com/Zimbra/zm-genesis/raw/develop/build/genesis.tar && \
+    tar xvf /tmp/genesis.tar -C /opt/qa/genesis --strip-components=1 && \
+    rm /tmp/genesis.tar
+
+RUN gpg --keyserver keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+
+RUN curl -sSL https://get.rvm.io | bash -s stable
+
+RUN source /etc/profile.d/rvm.sh && \
+  rvm install 2.0.0 --with-zlib-directory=/usr/local/rvm/usr --with-openssl-directory=/usr/local/rvm/usr
+
+RUN source /etc/profile.d/rvm.sh && gem install soap4r-spox log4r net-ldap json httpclient
+
+
+# ************************************************************************
 # Pre-create the zimbra user with known uid/gid so that IF a user wants to mount a host
 # directory into the container, the permissions will be correct.
+# ************************************************************************
 RUN groupadd -r -g 1000 zimbra && \
     useradd -r -g zimbra -u 1000 -b /opt -s /bin/bash zimbra
 
+# ************************************************************************
+# Download and do a package-only install of Zimbra
+# ************************************************************************
 RUN curl -s -k -o /tmp/zcs.tgz 'https://files.zimbra.com.s3.amazonaws.com/downloads/8.8.3_GA/zcs-8.8.3_GA_1872.UBUNTU16_64.20170905143325.tgz'
 RUN mkdir -p /tmp/release && \
     tar xzvf /tmp/zcs.tgz -C /tmp/release --strip-components=1 && \
