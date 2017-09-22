@@ -1,0 +1,3 @@
+Drop all of your genesis files in here.
+By default this directory will be mounted into the 
+genesis container at /opt/qa/genesis

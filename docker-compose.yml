@@ -9,7 +9,7 @@ services:
     volumes:
       - ./bind-data:/data/
     container_name: bind
-    domainname: zcs-foss.test
+    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
     dns:
       - 8.8.8.8
     hostname: bind
@@ -48,6 +48,26 @@ services:
       - "8143:143"
       - "8443:443"
       - "8993:993"
+
+  genesis:
+    image: ubuntu:16.04
+    env_file: .env
+    entrypoint:
+      - /bin/sleep
+      - infinity
+    container_name: genesis
+    depends_on:
+      - zimbra
+    volumes:
+      - ./genesis:/opt/qa/genesis/
+    dns:
+      - 10.0.1.2
+      - 8.8.8.8
+    hostname: genesis
+    networks:
+      default:
+        ipv4_address: 10.0.1.4
+    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
 
 networks:
   default:
