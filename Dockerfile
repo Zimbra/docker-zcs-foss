@@ -18,7 +18,7 @@ RUN apt-get update && \
 # Runtime will reconfigure to match what is in environment
 RUN apt-get install -y man psutils psmisc ruby-dev gcc && \
     echo "tzdata tzdata/Areas select Etc" > /tmp/tzdata.txt && \
-    echo "tzdata tzdata/Zones/US select UTC" >> /tmp/tzdata.txt && \
+    echo "tzdata tzdata/Zones/Etc select UTC" >> /tmp/tzdata.txt && \
     export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     debconf-set-selections /tmp/tzdata.txt && \
     apt-get install -y tzdata

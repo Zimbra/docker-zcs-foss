@@ -4,6 +4,7 @@
 ROOT_PASSWORD=password
 # Timezone settings for tzdata.
 # NOTE: Make sure these are compatible with the TIME_ZONE_ID shown below.
+#       Genesis tests rquire PDT
 TZDATA_AREA=US
 TZDATA_ZONE=Pacific
 # The following are used to do template substitution in the 

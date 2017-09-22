@@ -17,11 +17,13 @@
 #   TZDATA_ZONE
 #
 
+rm -f /etc/timezone /etc/localtime
+
 echo "tzdata tzdata/Areas select ${TZDATA_AREA}" > /tmp/tzdata.txt
-echo "tzdata tzdata/Zones/US select ${TZDATA_ZONE}" >> /tmp/tzdata.txt
+echo "tzdata tzdata/Zones/${TZDATA_AREA} select ${TZDATA_ZONE}" >> /tmp/tzdata.txt
 export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     debconf-set-selections /tmp/tzdata.txt && \
-    dpkg-reconfigure tzdata
+    sudo dpkg-reconfigure -f noninteractive tzdata
 
 grep -q 'CONFIG SESSION COMPLETE' /opt/zimbra/.install_history
 if [ $? -eq 0 ]
