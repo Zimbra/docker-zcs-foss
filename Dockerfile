@@ -34,6 +34,13 @@ RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
     ln -s /usr/bin/env /bin/env
 
 # ************************************************************************
+# Pre-create the zimbra user with known uid/gid so that IF a user wants to mount a host
+# directory into the container, the permissions will be correct.
+# ************************************************************************
+RUN groupadd -r -g 1000 zimbra && \
+    useradd -r -g zimbra -u 1000 -b /opt -s /bin/bash zimbra
+
+# ************************************************************************
 # Download and install the Genesis tests.  Set up and configure the
 # Ruby environment that is used for the test suite.
 # ************************************************************************
@@ -53,18 +60,10 @@ RUN gpg --keyserver keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D
 
 RUN curl -sSL https://get.rvm.io | bash -s stable
 
-RUN source /etc/profile.d/rvm.sh && \
-  rvm install 2.0.0 --with-zlib-directory=/usr/local/rvm/usr --with-openssl-directory=/usr/local/rvm/usr
+RUN /bin/bash -c 'source /etc/profile.d/rvm.sh && rvm install 2.0.0 --with-zlib-directory=/usr/local/rvm/usr --with-openssl-directory=/usr/local/rvm/usr'
 
-RUN source /etc/profile.d/rvm.sh && gem install soap4r-spox log4r net-ldap json httpclient
+RUN /bin/bash -c 'source /etc/profile.d/rvm.sh && gem install soap4r-spox log4r net-ldap json httpclient'
 
-
-# ************************************************************************
-# Pre-create the zimbra user with known uid/gid so that IF a user wants to mount a host
-# directory into the container, the permissions will be correct.
-# ************************************************************************
-RUN groupadd -r -g 1000 zimbra && \
-    useradd -r -g zimbra -u 1000 -b /opt -s /bin/bash zimbra
 
 # ************************************************************************
 # Download and do a package-only install of Zimbra
