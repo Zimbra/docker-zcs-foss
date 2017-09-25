@@ -10,6 +10,7 @@ RUN apt-get update && \
     gettext \
     linux-tools-common \
     openssh-client \
+    netbase \
     net-tools \
     rsyslog \
     software-properties-common \
