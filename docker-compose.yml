@@ -22,7 +22,7 @@ services:
       - "10000:10000/tcp"
 
   zimbra:
-    image: zimbra/zcs-foss:8.8.3-genesis
+    image: zimbra/zcs-foss:genesis
     env_file: .env
     entrypoint:
       - /zimbra/init
