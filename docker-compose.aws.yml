@@ -1,0 +1,41 @@
+version: "3.2"
+
+services:
+  zimbra:
+    image: zimbra/zcs-foss:genesis
+    deploy:
+        mode: replicated
+        replicas: 1
+    entrypoint:
+        - /bin/sleep
+        - infinity
+    env_file: .env
+    extra_hosts:
+        - "${ZIMBRA_HOST_NAME}:10.0.1.3"
+    hostname: ${ZIMBRA_HOST_NAME}
+    networks:
+      default:
+        ipv4_address: 10.0.1.3
+
+  genesis:
+    image: ubuntu:16.04
+    deploy:
+        mode: replicated
+        replicas: 1
+    env_file: .env
+    entrypoint:
+      - /bin/sleep
+      - infinity
+    depends_on:
+      - zimbra
+    hostname: genesis
+    networks:
+      default:
+        ipv4_address: 10.0.1.4
+
+networks:
+  default:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
