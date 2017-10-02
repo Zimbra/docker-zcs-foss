@@ -1,8 +1,9 @@
 #!/bin/bash
 # Perform template substitution in /zimbra/zimbra-config then configure the system
 # Expects the following environment variables to be set:
+#   HOSTNAME (from specification in the docker-compose file; e.g., 'zimbra-1')
 #   ZIMBRA_DEFAULT_DOMAIN
-#   ZIMBRA_DEFAULT_DOMAIN
+#   ZIMBRA_HOST_NAME
 #   TIME_ZONE_ID
 #   ADMIN_PW
 #   LDAP_ADMIN_PW
@@ -17,8 +18,20 @@
 #   TZDATA_ZONE
 #
 
-rm -f /etc/timezone /etc/localtime
+# Add entry in /etc/hosts from ZIMBRA_HOST_NAME
+# First check to make sure it hasn't already been appliec
+grep -q "${ZIMBRA_HOST_NAME}" /etc/hosts
+if [ $? != 0 ]; then
+    host_address=$(grep "${HOSTNAME}" /etc/hosts | awk '{print $1}')
+    echo "Adding mapping for ${ZIMBRA_HOST_NAME} to ${host_address} in /etc/hosts"
+    echo -e "${host_address}\t${ZIMBRA_HOST_NAME}" >> /etc/hosts
+else
+    echo "An entry for ${ZIMBRA_HOST_NAME} is already present in /etc/hosts"
+fi
 
+exit 0
+
+rm -f /etc/timezone /etc/localtime
 echo "tzdata tzdata/Areas select ${TZDATA_AREA}" > /tmp/tzdata.txt
 echo "tzdata tzdata/Zones/${TZDATA_AREA} select ${TZDATA_ZONE}" >> /tmp/tzdata.txt
 export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
