@@ -4,24 +4,25 @@ services:
   zimbra:
     image: zimbra/zcs-foss:genesis
     deploy:
-        mode: replicated
-        replicas: 1
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     entrypoint:
-        - /bin/sleep
-        - infinity
+      - /bin/sleep
+      - infinity
     env_file: .env
-    extra_hosts:
-        - "${ZIMBRA_HOST_NAME}:10.0.1.3"
-    hostname: ${ZIMBRA_HOST_NAME}
-    networks:
-      default:
-        ipv4_address: 10.0.1.3
+    hostname: zimbra-1
 
   genesis:
     image: ubuntu:16.04
     deploy:
-        mode: replicated
-        replicas: 1
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
     env_file: .env
     entrypoint:
       - /bin/sleep
@@ -29,9 +30,6 @@ services:
     depends_on:
       - zimbra
     hostname: genesis
-    networks:
-      default:
-        ipv4_address: 10.0.1.4
 
 networks:
   default:
