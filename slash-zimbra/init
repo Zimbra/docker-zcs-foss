@@ -18,6 +18,7 @@
 #   TZDATA_ZONE
 #
 
+SLEEP_SECS=10
 # Add entry in /etc/hosts from ZIMBRA_HOST_NAME
 # First check to make sure it hasn't already been appliec
 grep -q "${ZIMBRA_HOST_NAME}" /etc/hosts
@@ -31,6 +32,12 @@ fi
 
 # add entry in /etc/resolv.conf for the bind server
 bind_address=$(getent hosts bind | awk '{print $1}')
+while [ "${bind_address}x" = "x" ]; do
+    echo "Waiting for bind server"
+    sleep ${SLEEP_SECS}
+    bind_address=$(getent hosts bind | awk '{print $1}')
+done
+
 echo "Adding nameserver entry for bind server to /etc/resolv.conf at ${bind_address}"
 echo "nameserver ${bind_address}" >> /etc/resolv.conf
 

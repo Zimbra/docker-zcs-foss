@@ -7,8 +7,15 @@
 #   ZIMBRA_HOST_NAME
 # Will then start bind services
 
-ZIMBRA_HOST_IP=$(getent hosts zimbra | awk '{print $1}')
+SLEEP_SECS=10
 ZIMBRA_DNS_SERVER_IP=$(grep bind /etc/hosts | awk '{print $1}')
+ZIMBRA_HOST_IP=$(getent hosts zimbra | awk '{print $1}')
+
+while [ "${ZIMBRA_HOST_IP}x" = "x" ]; do
+    echo "Waiting for zimbra container to start"
+    sleep ${SLEEP_SECS}
+    ZIMBRA_HOST_IP=$(getent hosts zimbra | awk '{print $1}')
+done
 
 cat /data/bind/etc/named.conf.local.in | \
 sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
