@@ -1,6 +1,20 @@
 version: "3.2"
 
 services:
+  bind:
+    image: zimbra/zcs-bind:genesis
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+    env_file: .env
+    entrypoint:
+      - /data/init
+    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
+    hostname: bind
+
   zimbra:
     image: zimbra/zcs-foss:genesis
     deploy:
