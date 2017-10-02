@@ -7,6 +7,9 @@
 #   ZIMBRA_HOST_NAME
 # Will then start bind services
 
+ZIMBRA_HOST_IP=$(getent hosts zimbra | awk '{print $1}')
+ZIMBRA_DNS_SERVER_IP=$(grep bind /etc/hosts | awk '{print $1}')
+
 cat /data/bind/etc/named.conf.local.in | \
 sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
     -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/g" \
@@ -15,6 +18,8 @@ sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
 cat /data/bind/lib/zimbra.test.hosts.in | \
 sed -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/g" \
     -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/g" \
+    -e "s/ZIMBRA_HOST_IP/${ZIMBRA_HOST_IP}/g" \
+    -e "s/ZIMBRA_DNS_SERVER_IP/${ZIMBRA_DNS_SERVER_IP}/g" \
 > /data/bind/lib/zimbra.test.hosts
 
 /sbin/entrypoint.sh /usr/sbin/named
