@@ -29,7 +29,10 @@ else
     echo "An entry for ${ZIMBRA_HOST_NAME} is already present in /etc/hosts"
 fi
 
-exit 0
+# add entry in /etc/resolv.conf for the bind server
+bind_address=$(getent hosts bind | awk '{print $1}')
+echo "Adding nameserver entry for bind server to /etc/resolv.conf at ${bind_address}"
+echo "nameserver ${bind_address}" >> /etc/resolv.conf
 
 rm -f /etc/timezone /etc/localtime
 echo "tzdata tzdata/Areas select ${TZDATA_AREA}" > /tmp/tzdata.txt
