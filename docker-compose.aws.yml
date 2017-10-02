@@ -12,7 +12,6 @@ services:
     env_file: .env
     entrypoint:
       - /data/init
-    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
     hostname: bind
 
   zimbra:
