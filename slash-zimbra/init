@@ -25,7 +25,8 @@ grep -q "${ZIMBRA_HOST_NAME}" /etc/hosts
 if [ $? != 0 ]; then
     host_address=$(grep "${HOSTNAME}" /etc/hosts | awk '{print $1}')
     echo "Adding mapping for ${ZIMBRA_HOST_NAME} to ${host_address} in /etc/hosts"
-    echo -e "${host_address}\t${ZIMBRA_HOST_NAME}" >> /etc/hosts
+    cat /etc/hosts |  sed  -e "s/zimbra/${ZIMBRA_HOST_NAME} zimbra/" >  /tmp/hosts
+    cp /tmp/hosts /etc/hosts
 else
     echo "An entry for ${ZIMBRA_HOST_NAME} is already present in /etc/hosts"
 fi
