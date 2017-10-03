@@ -70,7 +70,6 @@ RUN curl -s -k -o /tmp/zcs.tgz 'https://files.zimbra.com.s3.amazonaws.com/downlo
 WORKDIR /tmp/release
 RUN sed -i.bak 's/checkRequired/# checkRequired/' install.sh && \
     ./install.sh -s -x --skip-upgrade-check < /zimbra/software-install-responses && \
-    echo "resolvconf resolvconf/linkify-resolvconf boolean true" | debconf-set-selections && \
     apt-get clean && \
     rm -rf /tmp/release
 

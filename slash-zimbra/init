@@ -40,6 +40,10 @@ while [ "${bind_address}x" = "x" ]; do
 done
 
 echo "Adding nameserver entry for bind server to /etc/resolv.conf at ${bind_address}"
+# NOTE: Correct way to update this would normally be to append an entry to 
+#       /etc/resolvconf/resolv.conf.d/head (or tail) and then run
+#       resolvconf -u, but that fails with the following:
+# /etc/resolvconf/update.d/libc: Warning: /etc/resolv.conf is not a symbolic link to /run/resolvconf/resolv.conf
 echo "nameserver ${bind_address}" >> /etc/resolv.conf
 
 rm -f /etc/timezone /etc/localtime
