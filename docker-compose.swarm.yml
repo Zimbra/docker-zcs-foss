@@ -17,6 +17,9 @@ services:
 
   zimbra:
     image: zimbra/zcs-foss:genesis
+    build:
+      context: "./"
+      dockerfile: "./Dockerfile"
     deploy:
       mode: replicated
       endpoint_mode: dnsrr
