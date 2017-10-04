@@ -38,21 +38,6 @@ RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
     useradd -r -g zimbra -u 1000 -b /opt -s /bin/bash zimbra
 
 # ************************************************************************
-# Download and install the Genesis tests.  Set up and configure the
-# Ruby environment that is used for the test suite.
-# ************************************************************************
-RUN mkdir -p /opt/qa/genesis && \
-    curl -k -s -o /tmp/genesis.tar 'https://zcsdocker.s3.amazonaws.com/genesis-20170921.tar' && \
-    tar xvf /tmp/genesis.tar -C /opt/qa/genesis --strip-components=1 && \
-    rm /tmp/genesis.tar && \
-    gpg --keyserver keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 && \
-    curl -sSL https://get.rvm.io | bash -s stable && \
-    /bin/bash -c 'source /etc/profile.d/rvm.sh && rvm install 2.0.0 --with-zlib-directory=/usr/local/rvm/usr --with-openssl-directory=/usr/local/rvm/usr' && \
-    /bin/bash -c 'source /etc/profile.d/rvm.sh && gem install soap4r-spox log4r net-ldap json httpclient' && \
-    /bin/bash -c 'source /etc/profile.d/rvm.sh && rvm cleanup all' && \
-    apt-get clean
-    
-# ************************************************************************
 # Download and do a package-only install of Zimbra
 # Trick build into skipping resolvconf as docker overrides for DNS
 # This is currently required by our installer script. Hopefully be
