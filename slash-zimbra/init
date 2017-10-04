@@ -79,6 +79,10 @@ else
         /opt/zimbra/libexec/zmsetup.pl -c /zimbra/zimbra-config
         sudo -i -u zimbra /bin/bash -c "crontab -l > /opt/zimbra/backup/crontab.bak"
         cp /etc/rsyslog.d/60-zimbra.conf /opt/zimbra/backup/60-zimbra.conf.bak
+
+        echo "Allow unauthenticated PINGs. This is required by the SOAP-Harness tests"
+        sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
+        sudo -i -u zimbra zmmailboxdctl restart
 fi
 # Startup and configure STAF
 export PATH=/usr/local/staf/bin:$PATH
