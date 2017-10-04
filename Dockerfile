@@ -12,6 +12,7 @@ RUN apt-get update && \
     openssh-client \
     netbase \
     net-tools \
+    openjdk-8-jdk \
     rsyslog \
     software-properties-common \
     vim \
