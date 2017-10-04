@@ -52,6 +52,23 @@ RUN curl -s -k -o /tmp/zcs.tgz 'https://files.zimbra.com.s3.amazonaws.com/downlo
     rm /tmp/zcs.tgz && \
     echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-selections
 
+# ************************************************************************
+# Install STAF to /usr/local/staf
+# 
+# Add the STAF libraries to the END of the list of places where libraries are searched
+# Some of the libraries included with STAF are wonky and will bork normal commands
+# if they are loaded first.
+# ************************************************************************
+RUN curl -L -o /tmp/staf-setup.bin 'http://downloads.sourceforge.net/project/staf/staf/V3.4.26/STAF3426-setup-linux-amd64-NoJVM.bin' && \
+    chmod +x /tmp/staf-setup.bin && \
+    /tmp/staf-setup.bin -i silent \
+       -DACCEPT_LICENSE=1 \
+       -DCHOSEN_INSTALL_SET=Custom \
+       -DCHOSEN_INSTALL_FEATURE_LIST=STAF,ExtSvcs,Langs,Codepage && \
+    rm /tmp/staf-setup.bin && \
+    echo /usr/local/staf/lib > /etc/ld.so.conf.d/zzz-staf.conf && \
+    ldconfig
+
 WORKDIR /tmp/release
 RUN sed -i.bak 's/checkRequired/# checkRequired/' install.sh && \
     ./install.sh -s -x --skip-upgrade-check < /zimbra/software-install-responses && \
