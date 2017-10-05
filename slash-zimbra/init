@@ -88,10 +88,11 @@ fi
 export PATH=/usr/local/staf/bin:$PATH
 echo 'PATH=/usr/local/staf/bin:$PATH' >> /root/.bashrc
 echo "starting STAF"
-/usr/local/staf/startSTAFProc.sh
+/usr/local/staf/startSTAFProc.sh 1>/dev/null 2>&1
 sleep 5
 echo "adding STAF services"
 STAF local service add service LOG LIBRARY STAFLog
+STAF local TRUST SET MACHINE '*' LEVEL 5
 echo "SETUP COMPLETE"
 /bin/sleep infinity
 
