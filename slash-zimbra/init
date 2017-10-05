@@ -91,7 +91,6 @@ echo "starting STAF"
 /usr/local/staf/startSTAFProc.sh
 sleep 5
 echo "adding STAF services"
-STAF local service add service SOAP LIBRARY JSTAF EXECUTE /opt/qa/soapvalidator/bin/zimbrastaf.jar
 STAF local service add service LOG LIBRARY STAFLog
 echo "SETUP COMPLETE"
 /bin/sleep infinity
