@@ -68,6 +68,10 @@ else
         echo "Allow unauthenticated PINGs. This is required by the SOAP-Harness tests"
         sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
         sudo -i -u zimbra zmmailboxdctl restart
+        echo "Enable local mail delivery"
+        sudo -i -u zimbra zmprov mcf zimbraMtaLmtpHostLookup native
+        sudo -i -u zimbra zmmtactl restart
+     
 fi
 # Startup and configure STAF
 export PATH=/usr/local/staf/bin:$PATH
