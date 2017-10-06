@@ -1,7 +1,4 @@
 # NOTE: No quotes around the following:
-# This is the password for the bind server webadmin interface, which
-# is exposed to the host at port 10000.  Username is root
-ROOT_PASSWORD=password
 # Timezone settings for tzdata.
 # NOTE: Make sure these are compatible with the TIME_ZONE_ID shown below.
 #       Genesis tests rquire PDT

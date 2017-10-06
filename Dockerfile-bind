@@ -1,3 +1,0 @@
-FROM sameersbn/bind:9.9.5-20170626
-COPY ./bind-data /data
-ENTRYPOINT ["/sbin/entrypoint.sh"]

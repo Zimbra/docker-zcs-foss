@@ -1,33 +1,11 @@
 version: "3.2"
 
 services:
-  bind:
-    image: sameersbn/bind:9.9.5-20170626
-    env_file: .env
-    entrypoint:
-      - /data/init
-    volumes:
-      - ./bind-data:/data/
-    container_name: bind
-    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
-    dns:
-      - 8.8.8.8
-    hostname: bind
-    networks:
-      default:
-        ipv4_address: 10.0.1.2
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "10000:10000/tcp"
-
   zimbra:
     image: zimbra/zcs-foss:genesis
     env_file: .env
     entrypoint:
       - /zimbra/init
-    depends_on:
-      - bind
     container_name: zimbra
     volumes:
       - type: volume
@@ -35,9 +13,6 @@ services:
         target: /opt/zimbra
         volume:
           nocopy: false
-    dns:
-      - 10.0.1.2
-      - 8.8.8.8
     hostname: ${ZIMBRA_HOST_NAME}
     networks:
       default:
@@ -48,26 +23,6 @@ services:
       - "8143:143"
       - "8443:443"
       - "8993:993"
-
-  genesis:
-    image: ubuntu:16.04
-    env_file: .env
-    entrypoint:
-      - /bin/sleep
-      - infinity
-    container_name: genesis
-    depends_on:
-      - zimbra
-    volumes:
-      - ./genesis:/opt/qa/genesis/
-    dns:
-      - 10.0.1.2
-      - 8.8.8.8
-    hostname: genesis
-    networks:
-      default:
-        ipv4_address: 10.0.1.4
-    domainname: ${ZIMBRA_DEFAULT_DOMAIN}
 
 networks:
   default:
