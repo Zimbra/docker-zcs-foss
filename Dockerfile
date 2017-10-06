@@ -76,4 +76,4 @@ RUN sed -i.bak 's/checkRequired/# checkRequired/' install.sh && \
     apt-get clean && \
     rm -rf /tmp/release
 
-EXPOSE 22 25 80 110 143 443 465 587 993 995 7071 8443
+EXPOSE 22 25 80 110 143 443 465 587 993 995 6500 6550 7071 8443
