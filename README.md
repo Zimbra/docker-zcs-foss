@@ -1,23 +1,9 @@
 ## Introduction
 
-This provides a simple two-container cluster:
+This provides a simple single-node Zimbra-FOSS container.
 
 - `zimbra` - A basic Zimbra installation. This is intended primarily for testing.  Currently running version 8.8.3.
-- `bind` - A simple bind DNS server, preconfigured with MX and A records.
 
-## feature/genesis branch notes
-
-If you are experimenting with the `feature/genesis` branch and you had been using `master`:
-
-* Removed the old docker volume before running. See instructions near the bottom of this _README_ if you need help.
-* Make sure to update your existing `.env` file with new information from the `DOT-env` template file. The `DOT-env` template file settings are correct for running the [zm-genesis](https://github.com/Zimbra/zm-genesis) tests, which are pre-installed and configured in the new Docker image.
-* You can delete your local copy of the old (`master` branch version of) the `zimbra/zcs-foss` Docker image if you like.
-
-To run the full Genesis test plan, execute the following on the running `zimbra` container:
-
-    cd /opt/qa/genesis && \
-    source /etc/profile.d/rvm.sh && \
-    ruby runtest.rb --plan conf/genesis/smokeoss.txt --log /tmp/genesis
 
 ## Preconditions
 
@@ -161,8 +147,6 @@ Results:
 
     $ docker stack deploy -c docker-compose.swarm.yml zcs
     Creating network zcs_default
-    Creating service zcs_genesis
-    Creating service zcs_bind
     Creating service zcs_zimbra
 
 ## Observe the zcs_zimbra service logs
@@ -175,7 +159,7 @@ Results:
 
     $ docker service ps zcs_zimbra
     ID                  NAME                IMAGE                     NODE                DESIRED STATE       CURRENT STATE             ERROR               PORTS
-    qcj4t3yo8j3a        zcs_zimbra.1        zimbra/zcs-foss:genesis   vm2                 Running             Preparing 2 minutes ago
+    qcj4t3yo8j3a        zcs_zimbra.1        zimbra/zcs-foss:latest    vm2                 Running             Preparing 2 minutes ago
 
 
 ## Connect to the machine that is running zcs_zimbra
@@ -186,7 +170,7 @@ $ docker-machine ssh vm2
 
     $ docker ps --filter "name=zcs_zimbra"
     CONTAINER ID        IMAGE                     COMMAND             CREATED             STATUS              PORTS                                                                                                       NAMES
-    a1d8fb65a91f        zimbra/zcs-foss:genesis   "/zimbra/init"      31 minutes ago      Up 31 minutes       22/tcp, 25/tcp, 80/tcp, 110/tcp, 143/tcp, 443/tcp, 465/tcp, 587/tcp, 993/tcp, 995/tcp, 7071/tcp, 8443/tcp   zcs_zimbra.1.qcj4t3yo8j3aju92efwz7hmfg
+    a1d8fb65a91f        zimbra/zcs-foss:latest    "/zimbra/init"      31 minutes ago      Up 31 minutes       22/tcp, 25/tcp, 80/tcp, 110/tcp, 143/tcp, 443/tcp, 465/tcp, 587/tcp, 993/tcp, 995/tcp, 7071/tcp, 8443/tcp   zcs_zimbra.1.qcj4t3yo8j3aju92efwz7hmfg
 
 Or, more compactly (because you just need the container ID):
 
@@ -204,8 +188,6 @@ Then you can connet to the container like normal.
 
     $ docker stack rm zcs
 
-    Removing service zcs_bind
-    Removing service zcs_genesis
     Removing service zcs_zimbra
     Removing network zcs_default
 

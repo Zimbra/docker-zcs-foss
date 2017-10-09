@@ -2,7 +2,7 @@ version: "3.2"
 
 services:
   zimbra:
-    image: zimbra/zcs-foss:genesis
+    image: zimbra/zcs-foss:latest
     env_file: .env
     entrypoint:
       - /zimbra/init
