@@ -1,2 +1,5 @@
 .env
 bind-data/webmin
+bind-data/bind/etc/named.conf.local
+bind-data/bind/lib/zimbra.test.hosts
+genesis
