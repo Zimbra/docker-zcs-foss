@@ -13,8 +13,12 @@ ZIMBRA_DEFAULT_DOMAIN=zimbra.zcs-foss.test
 #       previous value; however, the current limitation of
 #       the Genesis test suite is that the zmhostname
 #       _matches_ the default domain name...
+# NOTE: Accordingly, there is no `hostname` entry in the `docker-compose.yml` file
+#       for the `zimbra` service.
 ZIMBRA_HOST_NAME=zimbra.zcs-foss.test
-TIME_ZONE_ID=PDT
+MAILBOX_HOST_NAME=mailbox
+# NOTE: Escape the forward slash so that we do not break the sed command
+TIME_ZONE_ID=America\/Los_Angeles
 ADMIN_PW=test123
 LDAP_ADMIN_PW=zimbra
 LDAP_AMAVIS_PW=zimbra

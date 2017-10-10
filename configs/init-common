@@ -1,0 +1,151 @@
+#!/bin/bash
+# Perform template substitution in /zimbra/zimbra-config then configure the system
+# Expects the following environment variables to be set:
+#   HOSTNAME (from specification in the docker-compose file; e.g., 'zimbra-1')
+#   ZIMBRA_DEFAULT_DOMAIN
+#   ZIMBRA_HOST_NAME
+#   MAILBOX_HOST_NAME
+#   TIME_ZONE_ID
+#   ADMIN_PW
+#   LDAP_ADMIN_PW
+#   LDAP_AMAVIS_PW
+#   LDAP_POSTFIX_PW
+#   LDAP_REPLICATION_PW
+#   LDAP_ROOT_PW
+#   LDAP_BES_PW
+#   LDAP_NGINX_PW
+# Also reconfigures tzdata.  Expects these environment variables for that:
+#   TZDATA_AREA
+#   TZDATA_ZONE
+#
+
+SLEEP_SECS=10
+SLEEP_LONG_SECS=60
+
+# Add an entry for the specified host_ip and host_fqdn to /etc/hosts, if necessary
+# Arguments:
+# - host_fqdn
+# - host_ip
+# Side effects:
+# - Updates /etc/hosts
+# Returns:
+# - n/a
+function add_host_entry {
+    host_fqdn=$1
+    host_ip=$2
+
+    grep -q "${host_ip}.*${host_fqdn}" /etc/hosts
+    if [ $? != 0 ]; then
+        echo "Adding mapping for ${host_fqdn} to ${host_ip} in /etc/hosts"
+        echo -e "${host_ip}\t${host_fqdn}" >> /etc/hosts
+    else
+        echo "An entry for ${host_fqdn} is already present in /etc/hosts"
+    fi
+}
+
+function configure_staf {
+    # Startup and configure STAF
+    export PATH=/usr/local/staf/bin:$PATH
+    echo 'PATH=/usr/local/staf/bin:$PATH' >> /root/.bashrc
+    echo "starting STAF. output to /opt/zimbra/log/staf.log."
+    # NOTE: will see this error if you are watching the logs:
+    #       STAFProcess::processMonitorThread: Error opening /dev/tty, errno: 6
+    # That is OK. See: http://staf.sourceforge.net/current2x/STAFFAQ.htm#d0e332
+    /usr/local/staf/startSTAFProc.sh >/opt/zimbra/log/staf.log 2>&1 &
+    sleep ${SLEEP_SECS}
+    echo "adding STAF services"
+    STAF local service add service LOG LIBRARY STAFLog
+    echo "setting STAF trust level to 5"
+    STAF local TRUST SET MACHINE '*' LEVEL 5
+}
+
+function post_zmsetup_configuration {
+    echo "Allow unauthenticated PINGs. This is required by the SOAP-Harness tests"
+    sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
+    echo "Enable local mail delivery"
+    sudo -i -u zimbra zmprov mcf zimbraMtaLmtpHostLookup native
+    echo "Restarting zimbra"
+    sudo -i -u zimbra zmcontrol restart
+}
+
+# Updates /etc/hosts, if necessary, by adding an additional hosthame mapping
+# Arguments:
+# - host_fqdn
+# Side effects:
+# - Updates /etc/hosts if necessary
+# Returns:
+# - n/a
+# Depends on:
+# - HOSTNAME environment variable
+function update_host_entry {
+    host_fqdn=$1
+    HOST_ADDRESS=$(grep "${HOSTNAME}" /etc/hosts | awk '{print $1}')
+    grep -q "${HOST_ADDRESS}.*${host_fqdn}" /etc/hosts
+    if [ $? != 0 ]; then
+        echo "Adding mapping for ${host_fqdn} to ${HOST_ADDRESS} in /etc/hosts"
+        cat /etc/hosts | sed -e "s/${HOSTNAME}/${host_fqdn} ${HOSTNAME}/" >  /tmp/hosts
+        cp /tmp/hosts /etc/hosts
+    else
+        echo "An entry for ${host_fqdn} is already present in /etc/hosts"
+    fi
+}
+
+function update_zmsetup_config_file {
+    HOST_CIDR=$(echo $HOST_ADDRESS | sed -e 's/[[:digit:]]*$/0/')
+    cat /zimbra/config.in | sed \
+        -e "s/ZIMBRA_HOST_NAME/${ZIMBRA_HOST_NAME}/" \
+        -e "s/MAILBOX_HOST_NAME/${MAILBOX_HOST_NAME}/" \
+        -e "s/ZIMBRA_DEFAULT_DOMAIN/${ZIMBRA_DEFAULT_DOMAIN}/" \
+        -e "s/TIME_ZONE_ID/${TIME_ZONE_ID}/" \
+        -e "s/LDAP_ADMIN_PW/${LDAP_ADMIN_PW}/" \
+        -e "s/ADMIN_PW/${ADMIN_PW}/" \
+        -e "s/LDAP_AMAVIS_PW/${LDAP_AMAVIS_PW}/" \
+        -e "s/LDAP_POSTFIX_PW/${LDAP_POSTFIX_PW}/" \
+        -e "s/LDAP_REPLICATION_PW/${LDAP_REPLICATION_PW}/" \
+        -e "s/LDAP_ROOT_PW/${LDAP_ROOT_PW}/" \
+        -e "s/LDAP_BES_PW/${LDAP_BES_PW}/" \
+        -e "s/LDAP_NGINX_PW/${LDAP_NGINX_PW}/" \
+        -e "s/HOST_ADDRESS/${HOST_ADDRESS}/" \
+        -e "s/HOST_CIDR/${HOST_CIDR}/" \
+        > /zimbra/config
+}
+
+function update_tzdata_config {
+    echo "Updating tzdata configuration"
+    rm -f /etc/timezone /etc/localtime
+    echo "tzdata tzdata/Areas select ${TZDATA_AREA}" > /tmp/tzdata.txt
+    echo "tzdata tzdata/Zones/${TZDATA_AREA} select ${TZDATA_ZONE}" >> /tmp/tzdata.txt
+    export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+        debconf-set-selections /tmp/tzdata.txt && \
+        sudo dpkg-reconfigure -f noninteractive tzdata
+}
+
+# Sleep until the service address resolves
+# Arguments:
+# - service_name
+# Returns:
+# - IP address of the service
+function wait_for_service {
+    service_name=$1
+    service_ip=$(getent hosts ${service_name} | awk '{print $1}')
+    while [ "${service_ip}x" = "x" ]; do
+        echo "Waiting for ${service_name} container to start"
+        sleep ${SLEEP_SECS}
+        service_ip=$(getent hosts ${service_name} | awk '{print $1}')
+    done
+    echo ${service_ip}
+}
+
+# Wait until STAF services are running
+# Arguments:
+# - host_fqdn
+function wait_for_staf {
+    host_fqdn=$1
+    echo "OK" | nc -q 1 ${host_fqdn} 6500 2>/dev/null
+    while [ $? -ne 0 ]; do
+        echo "Waiting for ${host_fqdn} services to come up.  Sleeping for ${SLEEP_LONG_SECS} seconds..."
+        sleep ${SLEEP_LONG_SECS}
+        echo "OK" | nc -q 1 ${host_fqdn} 6500 2>/dev/null
+    done
+}
+

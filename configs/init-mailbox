@@ -1,0 +1,40 @@
+#!/bin/bash
+source /zimbra/init-common
+
+# Removed packages that we do not need
+apt-get update
+apt-get remove -y --autoremove zimbra-ldap zimbra-mta zimbra-memcached zimbra-proxy zimbra-imapd
+# These get left behind and have to be manually deleted.
+rm -rf /opt/zimbra/data/amavisd
+rm -rf /opt/zimbra/data/postfix
+
+# These should be removed as well, but doing so removes pretty much *everything*
+# else (including zimbra-store and zimbra-core), so our packaging for these
+# is seriously messed-up!
+#   apt-get remove -y zimbra-postfix zimbra-postfix-logwatch
+# So, as a workaround, we manually delete this file, which is what 
+# zmcontrol uses as a flag when it determines whether to try and 
+# start/stop the mta.
+rm -rf /opt/zimbra/common/sbin/postfix
+
+mailbox_fqdn="${MAILBOX_HOST_NAME}.${ZIMBRA_DEFAULT_DOMAIN}"
+update_host_entry ${mailbox_fqdn}
+# NOTE: Currently genesis tests assume that the zmhostname == zimbra_default_domain
+#       A fix for this is in progress
+zimbra_fqdn=${ZIMBRA_HOST_NAME}
+zimbra_ip=$(wait_for_service zimbra)
+add_host_entry ${zimbra_fqdn} ${zimbra_ip}
+update_tzdata_config
+update_zmsetup_config_file
+
+# Wait for zimbra service to complete initialization before we process.
+# Currently we are doing this by waiting until STAF is running, as that is 
+# the last setup step performed by the zimbra service setup
+wait_for_staf ${zimbra_fqdn}
+
+# Configure Zimbra
+/opt/zimbra/libexec/zmsetup.pl -c /zimbra/config
+post_zmsetup_configuration 
+echo "SETUP COMPLETE"
+/bin/sleep infinity
+

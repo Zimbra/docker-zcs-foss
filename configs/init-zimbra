@@ -1,0 +1,30 @@
+#!/bin/bash
+source /zimbra/init-common
+
+# Removed packages that we do not need
+apt-get remove -y --autoremove zimbra-store zimbra-apache zimbra-spell
+# These do not get removed automatically
+rm -rf /opt/zimbra/jetty*
+rm -rf /opt/zimbra/mailboxd
+# Interestingly removing the above packages results in /opt/zimbra/log being
+# deleted, so we re-create it here and give it appropriate permissions.
+mkdir -p /opt/zimbra/log
+chown zimbra:zimbra /opt/zimbra/log
+
+# NOTE: Currently genesis tests assume that the zmhostname == zimbra_default_domain
+#       A fix for this is in progress
+zimbra_fqdn=${ZIMBRA_HOST_NAME}
+update_host_entry ${zimbra_fqdn}
+mailbox_ip=$(wait_for_service mailbox)
+mailbox_fqdn="${MAILBOX_HOST_NAME}.${ZIMBRA_DEFAULT_DOMAIN}"
+add_host_entry ${mailbox_fqdn} ${mailbox_ip}
+update_tzdata_config
+update_zmsetup_config_file
+
+# Configure Zimbra
+/opt/zimbra/libexec/zmsetup.pl -c /zimbra/config
+post_zmsetup_configuration 
+configure_staf 
+echo "SETUP COMPLETE"
+/bin/sleep infinity
+

@@ -1,13 +1,26 @@
 ## Introduction
 
-This provides a simple single-node Zimbra-FOSS container.
+This branch deploys a 2-node Zimbra installation. Currently running version 8.8.3. It is configured to deploy into a Docker swarm.  You can easily configure a local Docker engine to run a single-node swarm, so this is not difficult to handle.  These are the services that get deployed with the stack
 
-- `zimbra` - A basic Zimbra installation. This is intended primarily for testing.  Currently running version 8.8.3.
+- `zimbra`. This service runs the following:
+    - `zimbra-ldap`
+    - `zimbra-mta`
+    - `zimbra-snmp`
+    - `zimbra-memcached`
+    - `zimbra-proxy`
+    - `zimbra-imapd`
+    - `STAF`
+- `mailbox`
+    - `zimbra-store`
+    - `zimbra-apache`
+    - `zimbra-snmp`
+    - `zimbra-spell`
 
 
 ## Preconditions
 
-The following assumes you have `docker` and `docker-compose` installed.  See [this page](https://github.com/Zimbra/docker-zcs-dev-machine) for help with that.
+
+
 
 ## Setup
 
@@ -192,10 +205,3 @@ Remove the machines.
     About to remove vm3
     WARNING: This action will delete both local reference and remote instance.
     Successfully removed vm3
-
-
-
-
-
-
-
