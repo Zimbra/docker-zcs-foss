@@ -46,6 +46,7 @@ function add_host_entry {
 function configure_staf {
     # Startup and configure STAF
     export PATH=/usr/local/staf/bin:$PATH
+    # shellcheck disable=SC2016
     echo 'PATH=/usr/local/staf/bin:$PATH' >> /root/.bashrc
     echo "starting STAF. output to /opt/zimbra/log/staf.log."
     # NOTE: will see this error if you are watching the logs:
@@ -57,6 +58,17 @@ function configure_staf {
     STAF local service add service LOG LIBRARY STAFLog
     echo "setting STAF trust level to 5"
     STAF local TRUST SET MACHINE '*' LEVEL 5
+}
+
+# Lookup the desired service by service name
+# Parameters:
+# - service name; e.g., "zimbra"
+# Returns:
+# - The IP address of the service if it is available or an empty string
+function lookup_service {
+    service_name=$1
+    service_resp=$(getent hosts ${service_name} | awk '{print $1}')
+    echo "${service_resp}"
 }
 
 function post_zmsetup_configuration {
@@ -83,7 +95,7 @@ function update_host_entry {
     grep -q "${HOST_ADDRESS}.*${host_fqdn}" /etc/hosts
     if [ $? != 0 ]; then
         echo "Adding mapping for ${host_fqdn} to ${HOST_ADDRESS} in /etc/hosts"
-        cat /etc/hosts | sed -e "s/${HOSTNAME}/${host_fqdn} ${HOSTNAME}/" >  /tmp/hosts
+        sed -e "s/${HOSTNAME}/${host_fqdn} ${HOSTNAME}/" < /etc/hosts > /tmp/hosts
         cp /tmp/hosts /etc/hosts
     else
         echo "An entry for ${host_fqdn} is already present in /etc/hosts"
@@ -127,11 +139,11 @@ function update_tzdata_config {
 # - IP address of the service
 function wait_for_service {
     service_name=$1
-    service_ip=$(getent hosts ${service_name} | awk '{print $1}')
+    service_ip=$(lookup_service ${service_name})
     while [ "${service_ip}x" = "x" ]; do
-        echo "Waiting for ${service_name} container to start"
+        (>&2 echo "Waiting for ${service_name} container to start")
         sleep ${SLEEP_SECS}
-        service_ip=$(getent hosts ${service_name} | awk '{print $1}')
+        service_ip=$(lookup_service ${service_name})
     done
     echo ${service_ip}
 }
