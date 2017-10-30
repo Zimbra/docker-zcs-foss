@@ -19,6 +19,7 @@
 #
 
 SLEEP_SECS=10
+service ssh start
 # Add entry in /etc/hosts from ZIMBRA_HOST_NAME
 # First check to make sure it hasn't already been appliec
 HOST_ADDRESS=$(grep "${HOSTNAME}" /etc/hosts | awk '{print $1}')
