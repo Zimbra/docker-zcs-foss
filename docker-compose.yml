@@ -7,12 +7,6 @@ services:
     entrypoint:
       - /zimbra/init
     container_name: zimbra
-    volumes:
-      - type: volume
-        source: opt_zimbra
-        target: /opt/zimbra
-        volume:
-          nocopy: false
     hostname: ${ZIMBRA_HOST_NAME}
     networks:
       default:
@@ -31,5 +25,3 @@ networks:
       config:
         - subnet: 10.0.1.0/24
 
-volumes:
-    opt_zimbra:
