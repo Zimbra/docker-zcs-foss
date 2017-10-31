@@ -30,6 +30,7 @@ Run the command `docker-compose down` (from inside the local copy of this repo t
 These are the packages that are selected for installation:
 
 - `zimbra-ldap`
+- `zimbra-logger`
 - `zimbra-mta`
 - `zimbra-store`
 - `zimbra-apache`
@@ -38,41 +39,6 @@ These are the packages that are selected for installation:
 - `zimbra-proxy`
 - `zimbra-imapd`
 
-## Data Persistence
-
-**NOTE: This is experimental.**
-
-The `docker-compose.yml` defines a Docker volume that gets mounted to `/opt/zimbra`.  It gets created the first time you bring up the containers.  You can see the volume that gets created, as in the following example:
-
-    $ docker volume ls
-    DRIVER              VOLUME NAME
-    local               dockerzcsfoss_opt_zimbra
-
-Normally, when you stop the cluster, you would lose your current Zimbra data. But with this volume, when you restart the cluster, it will remount that volume and you just keep going where you left off last.
-
-This feature is marked as experimental, because during a normal install configuration, some information outside of `/opt/zimbra` is added or changed and it is possible that, at the current time, not all of that is being restored correctly.  Take a look at the `init` script in the `slash-zimbra` directory to see what is currently being handled.  Let me know if I missed anything.
-
-If you _want_ to reset the data, just stop the cluster and remove the volume like this:
-
-	docker volume rm dockerzcsfoss_opt_zimbra
-
-The next time you start the cluster it will recreate that volume run through the `zmsetup.pl` process again.
-
-## Disabling Data Persistence
-
-If you do _not_ need the _Data Persistence_ feture, just edit the `docker-compose.yml` file and remove the following:
-
-
-    volumes:
-      - type: volume
-        source: opt_zimbra
-        target: /opt/zimbra
-        volume:
-          nocopy: false
-
-
-    volumes:
-        opt_zimbra:
 
 ## Running in a local docker swarm
 
