@@ -77,6 +77,8 @@ else
         echo "Disable max imap/pop3 max error limits. Required for Genesis"
         echo "Enable local mail delivery"
         sudo -i -u zimbra zmprov mcf zimbraMtaLmtpHostLookup native
+        echo "Enable admin access via proxy"
+        sudo -i -u zimbra /opt/zimbra/libexec/zmproxyconfig -e -w -C -H ${ZIMBRA_HOST_NAME}
         echo "Restarting zimbra"
         sudo -i -u zimbra zmcontrol restart
      
