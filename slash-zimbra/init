@@ -72,6 +72,9 @@ else
 
         echo "Allow unauthenticated PINGs. This is required by the SOAP-Harness tests"
         sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
+        echo "Disable max imap/pop3 max error limits. Required for Genesis"
+        sudo -i -u zimbra zmlocalconfig -e imap_max_consecutive_error=0 pop3_max_consecutive_error=0
+        echo "Disable max imap/pop3 max error limits. Required for Genesis"
         echo "Enable local mail delivery"
         sudo -i -u zimbra zmprov mcf zimbraMtaLmtpHostLookup native
         echo "Restarting zimbra"
