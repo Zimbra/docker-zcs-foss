@@ -17,8 +17,7 @@ ZIMBRA_DEFAULT_DOMAIN=zimbra.zcs-foss.test
 #       for the `zimbra` service.
 ZIMBRA_HOST_NAME=zimbra.zcs-foss.test
 MAILBOX_HOST_NAME=mailbox
-# NOTE: Escape the forward slash so that we do not break the sed command
-TIME_ZONE_ID=America\/Los_Angeles
+TIME_ZONE_ID=PDT
 ADMIN_PW=test123
 LDAP_ADMIN_PW=zimbra
 LDAP_AMAVIS_PW=zimbra
