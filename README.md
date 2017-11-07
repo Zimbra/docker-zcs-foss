@@ -3,18 +3,21 @@
 This branch deploys a 2-node Zimbra installation. Currently running version 8.8.3. It is configured to deploy into a Docker swarm.  You can easily configure a local Docker engine to run a single-node swarm, so this is not difficult to handle.  These are the services that get deployed with the stack
 
 - `zimbra`. This service runs the following:
-    - `zimbra-ldap`
-    - `zimbra-mta`
-    - `zimbra-snmp`
-    - `zimbra-memcached`
-    - `zimbra-proxy`
     - `zimbra-imapd`
+    - `zimbra-ldap`
+    - `zimbra-logger`
+    - `zimbra-memcached`
+    - `zimbra-mta`
+    - `zimbra-proxy`
+    - `zimbra-snmp`
     - `STAF`
 - `mailbox`
-    - `zimbra-store`
     - `zimbra-apache`
+    - `zimbra-logger`
     - `zimbra-snmp`
     - `zimbra-spell`
+    - `zimbra-store`
+    - `STAF`
 
 
 ## Preconditions
@@ -24,36 +27,31 @@ This branch deploys a 2-node Zimbra installation. Currently running version 8.8.
 
 ## Setup
 
-Clone a copy of this repo. Then, from inside your local clone of the repo:
+* Clone a copy of this repo. Then, from inside your local clone of the repo:
+* Copy the file `DOT-env` to `.env`.  Update `.env` as desired.
+* Make sure you have an available Docker swarm (with your shell configured appropriately as necessary).
 
-Copy the file `DOT-env` to `.env`.  Update `.env` as desired.
+## Deploy the Stack
 
-## Start the Cluster
+Just run the command `docker stack deploy --compose-file docker-compose.yml <stack-name>`. For example:
 
-Run the command `docker-compose up -d && docker logs -f zimbra`. When you see `SETUP COMPLETE`, you can `C-c` out of the `docker logs...` command. The _first_ time you do this, it will take longer to complete startup as it is having to run `zmsetup.pl` and apply your configuration.  Future startups are faster.  See the _Data Persistence_ section below for details.
+    docker stack deploy --compose-file docker-compose.yml zcs
 
-To log into the `zimbra` container just do `docker exec -it zimbra bash`.
+## Undeploy the Stack
 
-## Stop the Cluster
+Just run the command `docker stack rm <stack-name`. For example:
 
-Run the command `docker-compose down` (from inside the local copy of this repo that you cloned).
+    docker stack rm zcs
 
-## Installed Zimbra Packages
+## Setting-up a local single-node docker swarm
 
-These are the packages that are selected for installation:
+These instructions assume you are using _Docker for Mac_.
 
-- `zimbra-ldap`
-- `zimbra-logger`
-- `zimbra-mta`
-- `zimbra-store`
-- `zimbra-apache`
-- `zimbra-spell`
-- `zimbra-memcached`
-- `zimbra-proxy`
-- `zimbra-imapd`
+### Create the swarm
 
+    docker swarm init
 
-## Running in a local docker swarm
+## Setting-up a local multi-node docker swarm
 
 These instructions assume that you have _Virtualbox_ installed. _NOTE:_ They will work just fine whether you are using _Docker for Mac_ or some other Docker installation.
 
