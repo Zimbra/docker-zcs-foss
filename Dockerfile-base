@@ -9,7 +9,7 @@ RUN apt-get update && \
     dnsutils \
     gettext \
     linux-tools-common \
-    openssh-client \
+    openssh-server \
     netbase \
     netcat \
     net-tools \

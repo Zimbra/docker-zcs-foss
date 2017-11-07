@@ -72,6 +72,8 @@ function lookup_service {
 }
 
 function post_zmsetup_configuration {
+    echo "Starting ssh service.  This is required by the SOAP-Harness tests"
+    service ssh start
     echo "Allow unauthenticated PINGs. This is required by the SOAP-Harness tests"
     sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
     echo "Enable local mail delivery"
