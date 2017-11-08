@@ -78,6 +78,8 @@ function post_zmsetup_configuration {
     sudo -i -u zimbra zmlocalconfig -e allow_unauthed_ping=true
     echo "Enable local mail delivery"
     sudo -i -u zimbra zmprov mcf zimbraMtaLmtpHostLookup native
+    echo "Running zmupdateauthkeys. This is required by the SOAP-Harness tests"
+    sudo -i -u zimbra zmupdateauthkeys
     echo "Restarting zimbra"
     sudo -i -u zimbra zmcontrol restart
 }
