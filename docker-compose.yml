@@ -1,27 +1,68 @@
-version: "3.2"
+version: "3.3"
 
 services:
   zimbra:
-    image: zimbra/zcs-foss:latest
+    image: localhost:5000/zcs-foss-base:latest
+    configs:
+      - source: init_common
+        target: /zimbra/init-common
+        mode: 0777
+      - source: init_zimbra
+        target: /zimbra/init
+        mode: 0777
+      - source: config_zimbra
+        target: /zimbra/config.in
+        mode: 0666
     env_file: .env
     entrypoint:
       - /zimbra/init
-    container_name: zimbra
+#    entrypoint:
+#      - /bin/sleep
+#      - infinity
     hostname: ${ZIMBRA_HOST_NAME}
     networks:
-      default:
-        ipv4_address: 10.0.1.3
+      - default
     ports:
       - "7071:7071"
       - "8143:143"
       - "8443:443"
       - "8993:993"
 
+  mailbox:
+    image: localhost:5000/zcs-foss-base:latest
+    configs:
+      - source: init_common
+        target: /zimbra/init-common
+        mode: 0777
+      - source: init_mailbox
+        target: /zimbra/init
+        mode: 0777
+      - source: config_mailbox
+        target: /zimbra/config.in
+        mode: 0666
+    env_file: .env
+    entrypoint:
+      - /zimbra/init
+#    entrypoint:
+#      - /bin/sleep
+#      - infinity
+    hostname: ${MAILBOX_HOST_NAME}
+    networks:
+      - default
+
+configs:
+  init_common:
+    file: ./configs/init-common
+  init_mailbox:
+    file: ./configs/init-mailbox
+  config_mailbox:
+    file: ./configs/config-mailbox
+  init_zimbra:
+    file: ./configs/init-zimbra
+  config_zimbra:
+    file: ./configs/config-zimbra
+     
+
 networks:
   default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.0.1.0/24
-
+    driver: overlay

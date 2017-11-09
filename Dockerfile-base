@@ -11,6 +11,7 @@ RUN apt-get update && \
     linux-tools-common \
     openssh-server \
     netbase \
+    netcat \
     net-tools \
     openjdk-8-jdk \
     rsyslog \
@@ -46,7 +47,6 @@ RUN sed -i.bak 's/^mesg/# mesg/' /root/.profile && \
 # on the `resolvconf` package, and configuration of that is what
 # was breaking install.sh
 # ************************************************************************
-COPY ./slash-zimbra /zimbra
 RUN curl -s -k -o /tmp/zcs.tgz 'https://files.zimbra.com.s3.amazonaws.com/downloads/8.8.3_GA/zcs-8.8.3_GA_1872.UBUNTU16_64.20170905143325.tgz' && \
     mkdir -p /tmp/release && \
     tar xzvf /tmp/zcs.tgz -C /tmp/release --strip-components=1 && \
@@ -70,9 +70,10 @@ RUN curl -L -o /tmp/staf-setup.bin 'http://downloads.sourceforge.net/project/sta
     echo /usr/local/staf/lib > /etc/ld.so.conf.d/zzz-staf.conf && \
     ldconfig
 
+COPY slash-zimbra/software-install-responses /tmp/software-install-responses
 WORKDIR /tmp/release
 RUN sed -i.bak 's/checkRequired/# checkRequired/' install.sh && \
-    ./install.sh -s -x --skip-upgrade-check < /zimbra/software-install-responses && \
+    ./install.sh -s -x --skip-upgrade-check < /tmp/software-install-responses && \
     apt-get clean && \
     rm -rf /tmp/release
 
