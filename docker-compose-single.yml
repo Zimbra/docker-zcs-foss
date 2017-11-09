@@ -1,0 +1,41 @@
+version: "3.3"
+
+services:
+  zimbra:
+    image: zimbra/zcs-foss-base:latest
+    configs:
+      - source: init_common
+        target: /zimbra/init-common
+        mode: 0777
+      - source: init_zimbra
+        target: /zimbra/init
+        mode: 0777
+      - source: config_zimbra
+        target: /zimbra/config.in
+        mode: 0666
+    env_file: .env
+    entrypoint:
+      - /zimbra/init
+#    entrypoint:
+#      - /bin/sleep
+#      - infinity
+    hostname: ${ZIMBRA_HOST_NAME}
+    networks:
+      - default
+    ports:
+      - "7071:7071"
+      - "8143:143"
+      - "8443:443"
+      - "8993:993"
+
+configs:
+  init_common:
+    file: ./configs/init-common
+  init_zimbra:
+    file: ./configs/init-zimbra-single
+  config_zimbra:
+    file: ./configs/config-zimbra-single
+
+networks:
+  default:
+    driver: overlay

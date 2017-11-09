@@ -1,0 +1,21 @@
+#!/bin/bash
+source /zimbra/init-common
+
+# NOTE: Currently genesis tests assume that the zmhostname == zimbra_default_domain
+#       A fix for this is in progress
+zimbra_fqdn=${ZIMBRA_HOST_NAME}
+update_host_entry ${zimbra_fqdn}
+update_tzdata_config
+update_zmsetup_config_file
+
+# Configure Zimbra
+/opt/zimbra/libexec/zmsetup.pl -c /zimbra/config
+echo "Enable admin access via proxy. Required for SOAP Harness tests "
+sudo -i -u zimbra /opt/zimbra/libexec/zmproxyconfig -e -w -C -H ${ZIMBRA_HOST_NAME}
+echo "Disable max imap/pop3 max error limits. Required for Genesis"
+sudo -i -u zimbra zmlocalconfig -e imap_max_consecutive_error=0 pop3_max_consecutive_error=0
+post_zmsetup_configuration 
+configure_staf 
+echo "SETUP COMPLETE"
+/bin/sleep infinity
+
