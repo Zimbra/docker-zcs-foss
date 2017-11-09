@@ -1,6 +1,24 @@
 ## Introduction
 
-This branch deploys a 2-node Zimbra installation. Currently running version 8.8.3. It is configured to deploy into a Docker swarm.  You can easily configure a local Docker engine to run a single-node swarm, so this is not difficult to handle.  These are the services that get deployed with the stack
+* Deploy a single or multi-node Zimbra installation into a Docker swarm.
+* Currently running version 8.8.3. 
+
+### Single Node Zimbra Services
+
+- `zimbra`. This service runs the following:
+    - `zimbra-apache`
+    - `zimbra-imapd`
+    - `zimbra-ldap`
+    - `zimbra-logger`
+    - `zimbra-memcached`
+    - `zimbra-mta`
+    - `zimbra-proxy`
+    - `zimbra-snmp`
+    - `zimbra-spell`
+    - `zimbra-store`
+    - `STAF`
+
+### Multi Node Zimbra Services
 
 - `zimbra`. This service runs the following:
     - `zimbra-imapd`
@@ -19,12 +37,6 @@ This branch deploys a 2-node Zimbra installation. Currently running version 8.8.
     - `zimbra-store`
     - `STAF`
 
-
-## Preconditions
-
-
-
-
 ## Setup
 
 * Clone a copy of this repo. Then, from inside your local clone of the repo:
@@ -33,13 +45,17 @@ This branch deploys a 2-node Zimbra installation. Currently running version 8.8.
 
 ## Deploy the Stack
 
-Just run the command `docker stack deploy --compose-file docker-compose.yml <stack-name>`. For example:
+### Single Node
 
-    docker stack deploy --compose-file docker-compose.yml zcs
+    docker stack deploy --compose-file docker-compose-single.yml <stack-name>
+
+### Multi Node
+
+    docker stack deploy --compose-file docker-compose-multi.yml <stack-name>
 
 ## Undeploy the Stack
 
-Just run the command `docker stack rm <stack-name`. For example:
+Just run the command `docker stack rm <stack-name>`. For example:
 
     docker stack rm zcs
 
