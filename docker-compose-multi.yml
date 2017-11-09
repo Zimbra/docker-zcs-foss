@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   zimbra:
-    image: localhost:5000/zcs-foss-base:latest
+    image: zimbra/zcs-foss-base:latest
     configs:
       - source: init_common
         target: /zimbra/init-common
@@ -29,7 +29,7 @@ services:
       - "8993:993"
 
   mailbox:
-    image: localhost:5000/zcs-foss-base:latest
+    image: zimbra/zcs-foss-base:latest
     configs:
       - source: init_common
         target: /zimbra/init-common
